@@ -5,10 +5,11 @@ static const int stationsQty = 3;
 static const char *stationsName[stationsQty] = {"RMF", "AntyRadio", "ESKA"};
 
 static unsigned long lastInteraction = 0;
-int currentStationIndex = 0;
 static int selector = 0;
 static int step = 0;
 static int lastStateCLK = HIGH;
+static int pinS1, pinS2, pinSW;
+int currentStationIndex = 0;
 bool inRadioMenu = false;
 
 void showRadioStations(Adafruit_SH110X &display, int selected)
@@ -35,15 +36,26 @@ void showRadioStations(Adafruit_SH110X &display, int selected)
     display.display();
 }
 
-void handleRadioStations(Adafruit_SH110X &display, int pinS1, int pinS2, int pinSW)
+void handleRadioStations(Adafruit_SH110X &display, int s1, int s2, int sw)
 {
-    if (!inRadioMenu)
-    {
-        inRadioMenu = true;
-        selector = currentStationIndex;
-        lastStateCLK = digitalRead(pinS1);
-        showRadioStations(display, selector);
-    }
+    pinS1 = s1;
+    pinS2 = s2;
+    pinSW = sw;
+
+    pinMode(pinS1, INPUT_PULLUP);
+    pinMode(pinS2, INPUT_PULLUP);
+    pinMode(pinSW, INPUT_PULLUP);
+
+    showRadioStations(display, selector);
+    selector = currentStationIndex;
+    lastStateCLK = digitalRead(pinS1);
+    // if (!inRadioMenu)
+    // {
+    //     inRadioMenu = true;
+    //     selector = currentStationIndex;
+    //     lastStateCLK = digitalRead(pinS1);
+    //     showRadioStations(display, selector);
+    // }
 
     if (digitalRead(pinSW) == LOW)
     {
@@ -84,4 +96,9 @@ void handleRadioStations(Adafruit_SH110X &display, int pinS1, int pinS2, int pin
         inRadioMenu = false;
         return;
     }
+}
+
+bool isInRadioMenu()
+{
+    return inRadioMenu;
 }

@@ -42,7 +42,6 @@ static void showMenu(int selected)
 
 static void showMainScreen()
 {
-    // extern bool wifiConnect; // extern mean that wifiConnect is already declared
     displayHelloMsg(*oled, wifiConnect);
 }
 
@@ -65,7 +64,7 @@ void initMenu(Adafruit_SH110X &display, int s1, int s2, int sw)
 
 void handleMenu()
 {
-    if (inRadioMenu)
+    if (isInRadioMenu())
         return;
 
     if (digitalRead(pinSW) == LOW)
@@ -91,7 +90,6 @@ void handleMenu()
                 else if (strcmp(menuItems[selectedOption], "Radio stations") == 0)
                 {
                     inRadioMenu = true;
-                    inMenu = false;
                     handleRadioStations(*oled, pinS1, pinS2, pinSW);
                 }
                 else if (strcmp(menuItems[selectedOption], "Exit") == 0)

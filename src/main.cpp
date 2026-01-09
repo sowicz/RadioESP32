@@ -4,6 +4,8 @@
 #include <Adafruit_SH110X.h>
 #include <WiFi.h>
 
+#include "secrets.h"
+
 #ifndef WIFI_SSID
 #define WIFI_SSID "UNKNOWN_SSID"
 #endif
@@ -11,7 +13,9 @@
 #define WIFI_PASS "UNKNOWN_PASS"
 #endif
 
-#include "secrets.h"
+const char *ssid = WIFI_SSID;
+const char *pass = WIFI_PASS;
+
 #include "Config.h"
 #include "time.h"
 #include "ClockView.h"
@@ -43,8 +47,9 @@ void setup()
 
   Wire.begin(SDA_PIN, SCL_PIN);
 
-  wifiConnect = connectToWifi(WIFI_SSID, WIFI_PASS, display);
+  wifiConnect = connectToWifi(ssid, pass, display);
   display.begin(I2C_ADDRESS, true);
+  // Loading animation
   // turnOnAnimation(display);
 
   // TIMEZONE
@@ -66,7 +71,7 @@ void loop()
   int currentStatePinS2 = digitalRead(PIN_S2);
 
   handleMenu();
-  if (!isInMenu() && !inRadioMenu)
+  if (!isInMenu() && !isInRadioMenu())
   {
     volumeEncoder(currentStatePinS1, currentStatePinS2, display);
     clockTimerView();

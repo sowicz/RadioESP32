@@ -10,5 +10,6 @@ extern bool inRadioMenu;
 
 void showRadioStations(Adafruit_SH110X &display, int selected);
 void handleRadioStations(Adafruit_SH110X &display, int pinS1, int pinS2, int pinSW);
+bool isInRadioMenu();
 
 #endif
