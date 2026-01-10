@@ -2,11 +2,10 @@
 #include "MainScreen.h"
 #include "Settings/SettingsScreen.h"
 #include "RadioStations/RadioStations.h"
+#include "EncoderInput.h"
 
 // Variables inner
 static Adafruit_SH110X *oled;
-static int pinS1, pinS2, pinSW;
-static int lastStateCLK = LOW;
 static int step = 0;
 static unsigned long lastInteraction = 0;
 static int selectedOption = 0;
@@ -32,8 +31,6 @@ static void showMenu(int selected)
         {
             oled->setTextColor(SH110X_WHITE);
         }
-        // oled->setCursor(2, i * 18);
-        // unsigned int a = i + 1;
         oled->setCursor(8, i * 16 + 4);
         oled->println(menuItems[i]);
     }
@@ -47,102 +44,71 @@ static void showMainScreen()
 
 // ------------------ API ------------------
 
-void initMenu(Adafruit_SH110X &display, int s1, int s2, int sw)
+void initMenu(Adafruit_SH110X &display)
 {
     oled = &display;
-    pinS1 = s1;
-    pinS2 = s2;
-    pinSW = sw;
-
-    pinMode(pinS1, INPUT_PULLUP);
-    pinMode(pinS2, INPUT_PULLUP);
-    pinMode(pinSW, INPUT_PULLUP);
-
-    lastStateCLK = digitalRead(pinS1);
     showMainScreen();
 }
 
-void handleMenu()
+void handleMenu(const InputEvent &ev)
 {
     if (isInRadioMenu())
         return;
 
-    if (digitalRead(pinSW) == LOW)
+    // delay(50);
+    if (ev.btn == SHORT)
     {
-        delay(50);
-        if (digitalRead(pinSW) == LOW)
+        if (!inMenu)
         {
-            if (!inMenu)
-            {
-                inMenu = true;
-                selectedOption = 0;
-                showMenu(selectedOption);
-            }
-            else
-            {
-                Serial.print("Wybrano opcję: ");
-                Serial.println(menuItems[selectedOption]);
+            inMenu = true;
+            selectedOption = 0;
+            showMenu(selectedOption);
+        }
+        else
+        {
+            Serial.print("Wybrano opcję: ");
+            Serial.println(menuItems[selectedOption]);
 
-                if (strcmp(menuItems[selectedOption], "Settings") == 0)
-                {
-                    showIpAddress(*oled);
-                }
-                else if (strcmp(menuItems[selectedOption], "Radio stations") == 0)
-                {
-                    inRadioMenu = true;
-                    handleRadioStations(*oled, pinS1, pinS2, pinSW);
-                }
-                else if (strcmp(menuItems[selectedOption], "Exit") == 0)
-                {
-                    inMenu = false;
-                    showMainScreen();
-                }
-            }
-            lastInteraction = millis();
-            while (digitalRead(pinSW) == LOW)
+            if (strcmp(menuItems[selectedOption], "Settings") == 0)
             {
+                showIpAddress(*oled);
             }
+            else if (strcmp(menuItems[selectedOption], "Radio stations") == 0)
+            {
+                handleRadioStations(*oled, ev);
+            }
+            else if (strcmp(menuItems[selectedOption], "Exit") == 0)
+            {
+                inMenu = false;
+                showMainScreen();
+            }
+        }
+        lastInteraction = millis();
+    }
+    else if (ev.btn == LONG)
+    {
+        if (inMenu)
+        {
+            inMenu = false;
+            showMainScreen();
+            lastInteraction = 0;
         }
     }
 
     // Encoder
-    if (inMenu)
+    if (inMenu && ev.delta != 0)
     {
-        int currentState = digitalRead(pinS2);
-        if (currentState != lastStateCLK)
-        {
-            if (digitalRead(pinS1) != currentState)
-            {
-                step++;
-            }
-            else
-            {
-                step--;
-            }
-
-            if (step >= 4)
-            {
-                selectedOption = (selectedOption + 1) % menuSize;
-                showMenu(selectedOption);
-                step = 0;
-                lastInteraction = millis();
-            }
-            else if (step <= -4)
-            {
-                selectedOption = (selectedOption - 1 + menuSize) % menuSize;
-                showMenu(selectedOption);
-                step = 0;
-                lastInteraction = millis();
-            }
-        }
-        lastStateCLK = currentState;
-
-        // Timeout return to main screen
-        if (millis() - lastInteraction > MENU_TIMEOUT && lastInteraction != 0)
-        {
-            inMenu = false;
-            showMainScreen();
-        }
+        int step = (ev.delta > 0) ? 1 : -1;
+        selectedOption = (selectedOption + step + menuSize) % menuSize;
+        showMenu(selectedOption);
+        lastInteraction = millis();
+    }
+    // Timeout return to main screen
+    if (inMenu && lastInteraction != 0 && (millis() - lastInteraction > MENU_TIMEOUT))
+    {
+        inMenu = false;
+        showMainScreen();
+        lastInteraction = 0;
     }
 }
 

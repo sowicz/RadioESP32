@@ -61,9 +61,9 @@ void setup()
   // configTime - first parametr is timezone offset (winter / summer )
   configTime(3600, 0, NTP_SERVER);       // connect ntp to get real time
   displayHelloMsg(display, wifiConnect); // show main screen
-  initClock(display);                    // Clock view
 
-  initMenu(display, PIN_S1, PIN_S2, PIN_SW);
+  initClock(display); // Clock view
+  initMenu(display);
 
   // ==========================
   // Audio library
@@ -78,8 +78,18 @@ void loop()
 
   InputEvent ev = readInput();
 
-  handleMenu();
-  if (!isInMenu() && !isInRadioMenu())
+  if (isInRadioMenu())
+  {
+    // Choose radio station
+    handleRadioStations(display, ev);
+  }
+  else
+  {
+    // main menu
+    handleMenu(ev);
+  }
+
+  if (!isInMenu())
   {
     volumeChange(ev, display);
     clockTimerView();

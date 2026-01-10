@@ -1,5 +1,6 @@
-#include "RadioStations.h"
 #include <Arduino.h>
+#include "RadioStations.h"
+#include "EncoderInput.h"
 
 static const int stationsQty = 3;
 static const char *stationsName[stationsQty] = {"RMF", "AntyRadio", "ESKA"};
@@ -36,62 +37,52 @@ void showRadioStations(Adafruit_SH110X &display, int selected)
     display.display();
 }
 
-void handleRadioStations(Adafruit_SH110X &display, int s1, int s2, int sw)
+void handleRadioStations(Adafruit_SH110X &display, const InputEvent &ev)
 {
-    pinS1 = s1;
-    pinS2 = s2;
-    pinSW = sw;
-
-    pinMode(pinS1, INPUT_PULLUP);
-    pinMode(pinS2, INPUT_PULLUP);
-    pinMode(pinSW, INPUT_PULLUP);
-
-    showRadioStations(display, selector);
     selector = currentStationIndex;
-    lastStateCLK = digitalRead(pinS1);
-    // if (!inRadioMenu)
-    // {
-    //     inRadioMenu = true;
-    //     selector = currentStationIndex;
-    //     lastStateCLK = digitalRead(pinS1);
-    //     showRadioStations(display, selector);
-    // }
+    showRadioStations(display, selector);
 
-    if (digitalRead(pinSW) == LOW)
+    if (!inRadioMenu)
     {
-        delay(50);
-        if (digitalRead(pinSW) == LOW)
-        {
-            currentStationIndex = selector;
-            inRadioMenu = false;
-            return;
-        }
+        inRadioMenu = true;
+        selector = currentStationIndex;
+        showRadioStations(display, selector);
     }
 
-    int currentState = digitalRead(pinS1);
-    if (currentState != lastStateCLK)
+    if (ev.btn == SHORT)
     {
-        if (digitalRead(pinS2) != currentState)
-            step++;
-        else
-            step--;
-
-        if (step >= 4)
-        {
-            selector = (selector + 1) % stationsQty;
-            showRadioStations(display, selector);
-            step = 0;
-        }
-        else if (step <= -4)
-        {
-            selector = (selector - 1 + stationsQty) % stationsQty;
-            showRadioStations(display, selector);
-            step = 0;
-        }
+        currentStationIndex = selector;
+        inRadioMenu = false;
+        return;
     }
 
-    lastStateCLK = currentState;
-    if (millis() - lastInteraction > RADIO_MENU_TIMEOUT && lastInteraction != 0)
+    if (inRadioMenu && ev.delta != 0)
+    {
+        int step = (ev.delta > 0) ? 1 : -1;
+        selector = (selector + step + stationsQty) % stationsQty;
+        showRadioStations(display, selector);
+        lastInteraction = millis();
+        // if (digitalRead(pinS2) != currentState)
+        //     step++;
+        // else
+        //     step--;
+
+        // if (step >= 4)
+        // {
+        //     selector = (selector + 1) % stationsQty;
+        //     showRadioStations(display, selector);
+        //     step = 0;
+        // }
+        // else if (step <= -4)
+        // {
+        //     selector = (selector - 1 + stationsQty) % stationsQty;
+        //     showRadioStations(display, selector);
+        //     step = 0;
+        // }
+    }
+
+    // if (millis() - lastInteraction > RADIO_MENU_TIMEOUT && lastInteraction != 0)
+    if (inRadioMenu && lastInteraction != 0 && (millis() - lastInteraction > RADIO_MENU_TIMEOUT))
     {
         inRadioMenu = false;
         return;
@@ -101,4 +92,14 @@ void handleRadioStations(Adafruit_SH110X &display, int s1, int s2, int sw)
 bool isInRadioMenu()
 {
     return inRadioMenu;
+}
+
+int getCurrentStationIndex()
+{
+    return currentStationIndex;
+}
+
+const char *getCurrentStationName()
+{
+    return stationsName[currentStationIndex];
 }
