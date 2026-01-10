@@ -45,12 +45,6 @@ void setup()
   // =======================
   //  ENCODER
   // =======================
-  // OLD :
-  pinMode(PIN_S1, INPUT_PULLUP);
-  pinMode(PIN_S2, INPUT_PULLUP);
-  pinMode(PIN_SW, INPUT_PULLUP);
-
-  // new initialize encoder
   encoderInit(PIN_S1, PIN_S2, PIN_SW);
 
   Wire.begin(SDA_PIN, SCL_PIN);
@@ -81,8 +75,6 @@ void setup()
 
 void loop()
 {
-  int currentStatePinS1 = digitalRead(PIN_S1);
-  int currentStatePinS2 = digitalRead(PIN_S2);
 
   InputEvent ev = readInput();
 
