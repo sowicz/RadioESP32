@@ -22,6 +22,24 @@ static int btnLastState = HIGH;
 static unsigned long btnPressedAt = 0;
 static int clickCount = 0;
 
+// ENCODER STEP
+static int encAccum = 0;
+static int ENC_STEP_SIZE = 1;
+static int ENC_THRESHOLD = 2;
+
+void encoderSetStepSize(int s)
+{
+    if (s < 1)
+        s = 1;
+    ENC_STEP_SIZE = s;
+}
+void encoderSetThreshold(int t)
+{
+    if (t < 1)
+        t = 1;
+    ENC_THRESHOLD = t;
+}
+
 void encoderInit(uint8_t encAPin, uint8_t encBPin, uint8_t btnPin)
 {
     ENC_A_PIN = encAPin;
@@ -48,7 +66,6 @@ InputEvent readInput()
     InputEvent ev{0, NONE};
     unsigned long now = millis();
 
-    // enkoder - prosty quadrature polling z debounce
     if (now - lastEncTime > ENC_DEBOUNCE_MS)
     {
         lastEncTime = now;
@@ -56,16 +73,14 @@ InputEvent readInput()
         int b = digitalRead(ENC_B_PIN);
         if (a != lastEncA)
         {
-            // detekcja kierunku: jeśli A zmieniło się i równe B -> +1, inaczej -1
-            if (a == b)
+            int raw = (a == b) ? +1 : -1;
+            encAccum += raw;
+            if (abs(encAccum) >= ENC_THRESHOLD)
             {
-                encPos++;
-                ev.delta = +1;
-            }
-            else
-            {
-                encPos--;
-                ev.delta = -1;
+                int sign = (encAccum > 0) ? +1 : -1;
+                encPos += sign * ENC_STEP_SIZE;
+                ev.delta = sign * ENC_STEP_SIZE;
+                encAccum = 0;
             }
         }
         lastEncA = a;

@@ -46,9 +46,9 @@ void setup()
   //  ENCODER
   // =======================
   // OLD :
-  // pinMode(PIN_S1, INPUT_PULLUP);
-  // pinMode(PIN_S2, INPUT_PULLUP);
-  // pinMode(PIN_SW, INPUT_PULLUP);
+  pinMode(PIN_S1, INPUT_PULLUP);
+  pinMode(PIN_S2, INPUT_PULLUP);
+  pinMode(PIN_SW, INPUT_PULLUP);
 
   // new initialize encoder
   encoderInit(PIN_S1, PIN_S2, PIN_SW);
@@ -71,6 +71,9 @@ void setup()
 
   initMenu(display, PIN_S1, PIN_S2, PIN_SW);
 
+  // ==========================
+  // Audio library
+  // ==========================
   //   audio.setPinout(I2S_BCK, I2S_WS, I2S_DATA_OUT);
   //   audio.setVolume(21);            // zakres 0...21
   //   audio.connecttohost("https://rs101-krk.rmfstream.pl/rmf_maxxx_lom");
@@ -81,14 +84,19 @@ void loop()
   int currentStatePinS1 = digitalRead(PIN_S1);
   int currentStatePinS2 = digitalRead(PIN_S2);
 
+  InputEvent ev = readInput();
+
   handleMenu();
   if (!isInMenu() && !isInRadioMenu())
   {
-    volumeEncoder(currentStatePinS1, currentStatePinS2, display);
+    volumeChange(ev, display);
     clockTimerView();
     showClockOLED(false);
   }
 
+  // ==========================
+  // Audio library
+  // ==========================
   //   audio.loop();
   //   vTaskDelay(1);
 };

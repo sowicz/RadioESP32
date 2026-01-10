@@ -8,42 +8,32 @@ int lastStateCLK = LOW;
 unsigned long lastUpdate = 0;
 const int showTime = 1000;
 
-
-
-void volumeEncoder(int currentStatePinS1, int currentStatePinS2, Adafruit_SH110X &display) {
-  if (currentStatePinS2 != lastStateCLK) {
-    // Sprawdzamy kierunek na podstawie stanu DT
-    if (currentStatePinS1 != currentStatePinS2) {
-        step++;
-    } else {   
-        step--;
+void volumeChange(const InputEvent &ev, Adafruit_SH110X &display)
+{
+  if (ev.delta == 0)
+  {
+    if (lastUpdate != 0 && (millis() - lastUpdate > showTime))
+    {
+      displayHelloMsg(display, true);
+      lastUpdate = 0;
     }
-
-    // jeśli step osiągnie 2 lub -2, dopiero wtedy zmieniamy counter
-    if (step >= 2) {
-      if (counter <= 49) {
-        counter++;
-      }
-      step = 0;
-      showVolume(counter, display);
-      lastUpdate = millis();
-
-    } else if (step <= -2) {
-      if (counter >= 1) {
-        counter--;
-      }
-      step = 0;
-      showVolume(counter, display);
-      lastUpdate = millis();
+    return;
+  }
+  int step = (ev.delta > 0) ? 1 : -1;
+  if (step > 0)
+  {
+    if (counter < 50)
+    {
+      counter++;
     }
   }
-
-  lastStateCLK = currentStatePinS2;
-
-  // jeśli minęła sekunda od ostatniego ruchu, wróć do main view
-  if (millis() - lastUpdate > showTime && lastUpdate != 0) {
-    // tu używasz display przekazanego jako referencja
-    displayHelloMsg(display, true); // lub false jeśli nie ma wifi
-    lastUpdate = 0; // żeby nie powtarzało
+  else
+  {
+    if (counter > 0)
+    {
+      counter--;
+    }
   }
+  showVolume(counter, display);
+  lastUpdate = millis();
 }
