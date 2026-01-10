@@ -16,6 +16,7 @@
 const char *ssid = WIFI_SSID;
 const char *pass = WIFI_PASS;
 
+#include "EncoderInput.h"
 #include "Config.h"
 #include "time.h"
 #include "ClockView.h"
@@ -41,15 +42,25 @@ void setup()
 {
   Serial.begin(115200);
 
-  pinMode(PIN_S1, INPUT_PULLUP);
-  pinMode(PIN_S2, INPUT_PULLUP);
-  pinMode(PIN_SW, INPUT_PULLUP);
+  // =======================
+  //  ENCODER
+  // =======================
+  // OLD :
+  // pinMode(PIN_S1, INPUT_PULLUP);
+  // pinMode(PIN_S2, INPUT_PULLUP);
+  // pinMode(PIN_SW, INPUT_PULLUP);
+
+  // new initialize encoder
+  encoderInit(PIN_S1, PIN_S2, PIN_SW);
 
   Wire.begin(SDA_PIN, SCL_PIN);
 
   wifiConnect = connectToWifi(ssid, pass, display);
   display.begin(I2C_ADDRESS, true);
+
+  // ====================
   // Loading animation
+  // ====================
   // turnOnAnimation(display);
 
   // TIMEZONE
