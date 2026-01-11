@@ -9,8 +9,6 @@ static const char *stationsName[stationsQty] = {"RMF", "AntyRadio", "ESKA"};
 static unsigned long lastInteraction = 0;
 static int selector = 0;
 static int step = 0;
-static int lastStateCLK = HIGH;
-static int pinS1, pinS2, pinSW;
 int currentStationIndex = 0;
 bool inRadioMenu = false;
 
