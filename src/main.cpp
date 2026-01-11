@@ -82,7 +82,7 @@ void loop()
 
   InputEvent ev = readInput();
 
-  if (ev.btn == SHORT && currentScreen != MENU_SCREEN)
+  if (ev.btn == SHORT && currentScreen == MAIN_SCREEN)
   {
     currentScreen = MENU_SCREEN;
   }
@@ -90,16 +90,16 @@ void loop()
   switch (currentScreen)
   {
   case MAIN_SCREEN:
-    // displayHelloMsg(display, wifiConnect);
     volumeEvent(ev, display);
     showClockOLED(false);
     clockTimerView();
     break;
   case MENU_SCREEN:
     handleMenu(ev, currentScreen);
-    // case SETTINGS_SCREEN:
-    //   showIpAddress(display);
-    //   break;
+    break;
+  case RADIO_STATIONS_SCREEN:
+    handleRadioStations(display, ev, currentScreen);
+    break;
   }
 
   // ==========================

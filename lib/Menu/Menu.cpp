@@ -71,11 +71,13 @@ void handleMenu(const InputEvent &ev, AppScreen &currentScreen)
 
             if (strcmp(menuItems[selectedOption], "Settings") == 0)
             {
+                // currentScreen = SETTINGS_SCREEN;
                 showIpAddress(*oled);
             }
             else if (strcmp(menuItems[selectedOption], "Radio stations") == 0)
             {
-                handleRadioStations(*oled, ev);
+                currentScreen = RADIO_STATIONS_SCREEN;
+                // handleRadioStations(*oled, ev);
             }
             else if (strcmp(menuItems[selectedOption], "Exit") == 0)
             {
@@ -91,6 +93,7 @@ void handleMenu(const InputEvent &ev, AppScreen &currentScreen)
         if (inMenu)
         {
             inMenu = false;
+            currentScreen = MAIN_SCREEN;
             showMainScreen();
             lastInteraction = 0;
         }
@@ -108,6 +111,7 @@ void handleMenu(const InputEvent &ev, AppScreen &currentScreen)
     if (inMenu && lastInteraction != 0 && (millis() - lastInteraction > MENU_TIMEOUT))
     {
         inMenu = false;
+        currentScreen = MAIN_SCREEN;
         showMainScreen();
         lastInteraction = 0;
     }

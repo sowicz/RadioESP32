@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "RadioStations.h"
 #include "EncoderInput.h"
+#include "Screens.h"
 
 static const int stationsQty = 3;
 static const char *stationsName[stationsQty] = {"RMF", "AntyRadio", "ESKA"};
@@ -37,54 +38,46 @@ void showRadioStations(Adafruit_SH110X &display, int selected)
     display.display();
 }
 
-void handleRadioStations(Adafruit_SH110X &display, const InputEvent &ev)
+void handleRadioStations(Adafruit_SH110X &display, const InputEvent &ev, AppScreen &currentScreen)
 {
-    selector = currentStationIndex;
-    showRadioStations(display, selector);
-
     if (!inRadioMenu)
     {
         inRadioMenu = true;
         selector = currentStationIndex;
+        lastInteraction = millis();
         showRadioStations(display, selector);
+        return;
     }
 
     if (ev.btn == SHORT)
     {
         currentStationIndex = selector;
         inRadioMenu = false;
+        currentScreen = MENU_SCREEN;
+
+        // test
+        Serial.print("Wybrano radio stacje: ");
+        Serial.println(stationsName[currentStationIndex]);
         return;
     }
 
     if (inRadioMenu && ev.delta != 0)
     {
         int step = (ev.delta > 0) ? 1 : -1;
-        selector = (selector + step + stationsQty) % stationsQty;
-        showRadioStations(display, selector);
+        int newSelector = (selector + step + stationsQty) % stationsQty;
+        if (newSelector != selector)
+        {
+            selector = newSelector;
+            showRadioStations(display, selector);
+        }
         lastInteraction = millis();
-        // if (digitalRead(pinS2) != currentState)
-        //     step++;
-        // else
-        //     step--;
-
-        // if (step >= 4)
-        // {
-        //     selector = (selector + 1) % stationsQty;
-        //     showRadioStations(display, selector);
-        //     step = 0;
-        // }
-        // else if (step <= -4)
-        // {
-        //     selector = (selector - 1 + stationsQty) % stationsQty;
-        //     showRadioStations(display, selector);
-        //     step = 0;
-        // }
     }
 
     // if (millis() - lastInteraction > RADIO_MENU_TIMEOUT && lastInteraction != 0)
     if (inRadioMenu && lastInteraction != 0 && (millis() - lastInteraction > RADIO_MENU_TIMEOUT))
     {
         inRadioMenu = false;
+        currentScreen = MENU_SCREEN;
         return;
     }
 }
