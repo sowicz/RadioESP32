@@ -3,6 +3,7 @@
 #include "Settings/SettingsScreen.h"
 #include "RadioStations/RadioStations.h"
 #include "EncoderInput.h"
+#include "Screens.h"
 
 // Variables inner
 static Adafruit_SH110X *oled;
@@ -50,12 +51,11 @@ void initMenu(Adafruit_SH110X &display)
     showMainScreen();
 }
 
-void handleMenu(const InputEvent &ev)
+void handleMenu(const InputEvent &ev, AppScreen &currentScreen)
 {
     if (isInRadioMenu())
         return;
 
-    // delay(50);
     if (ev.btn == SHORT)
     {
         if (!inMenu)
@@ -80,6 +80,7 @@ void handleMenu(const InputEvent &ev)
             else if (strcmp(menuItems[selectedOption], "Exit") == 0)
             {
                 inMenu = false;
+                currentScreen = MAIN_SCREEN;
                 showMainScreen();
             }
         }

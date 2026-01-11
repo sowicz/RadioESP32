@@ -22,15 +22,19 @@ const char *pass = WIFI_PASS;
 #include "ClockView.h"
 #include "MainScreen.h"
 #include "TurnOnAnimation.h"
-#include "VolumeEncoder.h"
+#include "volumeEvent.h"
 #include "WifiManager.h"
 #include "Menu.h"
 #include "RadioStations/RadioStations.h"
+#include "Settings/SettingsScreen.h"
+#include "Screens.h"
 
 // #include <Audio.h>
 
 Adafruit_SH1106G display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 bool wifiConnect = false;
+
+AppScreen currentScreen = MAIN_SCREEN;
 
 // ------------------------------------------
 // |             main program               |
@@ -78,22 +82,24 @@ void loop()
 
   InputEvent ev = readInput();
 
-  if (isInRadioMenu())
+  if (ev.btn == SHORT && currentScreen != MENU_SCREEN)
   {
-    // Choose radio station
-    handleRadioStations(display, ev);
-  }
-  else
-  {
-    // main menu
-    handleMenu(ev);
+    currentScreen = MENU_SCREEN;
   }
 
-  if (!isInMenu())
+  switch (currentScreen)
   {
-    volumeChange(ev, display);
-    clockTimerView();
+  case MAIN_SCREEN:
+    // displayHelloMsg(display, wifiConnect);
+    volumeEvent(ev, display);
     showClockOLED(false);
+    clockTimerView();
+    break;
+  case MENU_SCREEN:
+    handleMenu(ev, currentScreen);
+    // case SETTINGS_SCREEN:
+    //   showIpAddress(display);
+    //   break;
   }
 
   // ==========================

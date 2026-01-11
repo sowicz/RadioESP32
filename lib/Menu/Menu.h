@@ -5,12 +5,13 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SH110X.h>
 #include "EncoderInput.h"
+#include "Screens.h"
 
 const int MENU_TIMEOUT = 5000;
 extern bool wifiConnect;
 
 void initMenu(Adafruit_SH110X &display);
-void handleMenu(const InputEvent &ev);
+void handleMenu(const InputEvent &ev, AppScreen &currentScreen);
 bool isInMenu();
 
 #endif

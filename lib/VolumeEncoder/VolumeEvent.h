@@ -12,7 +12,7 @@ extern unsigned long lastUpdate;
 extern const int showTime;
 
 // funcs
-void volumeChange(const InputEvent &ev, Adafruit_SH110X &display);
+void volumeEvent(const InputEvent &ev, Adafruit_SH110X &display);
 void showVolume(int counter, Adafruit_SH110X &display); // decraled somewhere
 void displayHelloMsg(Adafruit_SH110X &display, bool wifiConnect);
 

@@ -1,4 +1,4 @@
-#include "volumeEncoder.h"
+#include "volumeEvent.h"
 #include "showVolume.h"
 
 // Variables definition
@@ -8,7 +8,7 @@ int lastStateCLK = LOW;
 unsigned long lastUpdate = 0;
 const int showTime = 1000;
 
-void volumeChange(const InputEvent &ev, Adafruit_SH110X &display)
+void volumeEvent(const InputEvent &ev, Adafruit_SH110X &display)
 {
   if (ev.delta == 0)
   {
