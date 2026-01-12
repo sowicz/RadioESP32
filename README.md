@@ -11,16 +11,16 @@ Urządzenie pozwala na sterowanie menu, wybór stacji radiowych i regulację gł
 
 ##
 
-![Main_screen](pictures/IMG_1527.JPEG)
+![Main_screen](https://github.com/sowicz/RadioESP32/blob/main/pictures/IMG_1527.jpeg)
 
 ##
 
-![Main_menu](pictures/IMG_1528.JPEG)
+![Main_menu](https://github.com/sowicz/RadioESP32/blob/main/pictures/IMG_1528.jpeg)
 
 ##
 
-![Radio_Stations](pictures/IMG_1530.JPEG)
+![Radio_Stations](https://github.com/sowicz/RadioESP32/blob/main/pictures/IMG_1530.jpeg)
 
 ##
 
-![Settings](pictures/IMG_1529.JPEG)
+![Settings](https://github.com/sowicz/RadioESP32/blob/main/pictures/IMG_1529.jpeg)
