@@ -28,8 +28,9 @@ const char *pass = WIFI_PASS;
 #include "RadioStations/RadioStations.h"
 #include "Settings/SettingsScreen.h"
 #include "Screens.h"
+#include "leds.h"
 
-// #include <Audio.h>
+#include "Audio.h"
 
 Adafruit_SH1106G display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 bool wifiConnect = false;
@@ -40,7 +41,7 @@ AppScreen currentScreen = MAIN_SCREEN;
 // |             main program               |
 // ------------------------------------------
 
-// Audio audio;
+Audio audio;
 
 void setup()
 {
@@ -68,13 +69,14 @@ void setup()
 
   initClock(display); // Clock view
   initMenu(display);
+  leds_init();
 
   // ==========================
   // Audio library
   // ==========================
-  //   audio.setPinout(I2S_BCK, I2S_WS, I2S_DATA_OUT);
-  //   audio.setVolume(21);            // zakres 0...21
-  //   audio.connecttohost("https://rs101-krk.rmfstream.pl/rmf_maxxx_lom");
+  audio.setPinout(I2S_BCK, I2S_WS, I2S_DATA_OUT);
+  audio.setVolume(21); // zakres 0...21
+  audio.connecttohost("https://rs101-krk.rmfstream.pl/rmf_maxxx_lom");
 };
 
 void loop()
@@ -101,12 +103,12 @@ void loop()
     handleRadioStations(display, ev, currentScreen);
     break;
   }
-
+  leds_update();
   // ==========================
   // Audio library
   // ==========================
-  //   audio.loop();
-  //   vTaskDelay(1);
+  // audio.loop();
+  // vTaskDelay(1);
 };
 
 // --------------- SERIAL PRINTS FOR AUDIO LIBRARY ----------------
